@@ -74,11 +74,14 @@
                             <li data-id="{{ $user->id }}" data-name="{{ $user->name }}">
                                 <a class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
                                     href="#">
-                                    @if($user->profile_image)
-                                    <img src="data:image/jpeg;base64,{{ $user->profile_image }}" alt="{{ $user->name }}'s avatar" class="rounded-full" style="width: 50px; height: 50px; object-fit: cover;">
-                                @else
-                                    <img src="https://ui-avatars.com/api/?name={{ $user->name }}&rounded=true&background=random" alt="{{ $user->name }}'s avatar" height="50" width="50">
-                                @endif
+                                    @if ($user->profile_image)
+                                        <img src="data:image/jpeg;base64,{{ $user->profile_image }}"
+                                            alt="{{ $user->name }}'s avatar" class="rounded-full"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    @else
+                                        <img src="https://ui-avatars.com/api/?name={{ $user->name }}&rounded=true&background=random"
+                                            alt="{{ $user->name }}'s avatar" height="50" width="50">
+                                    @endif
                                     {{ $user->name }}
                                 </a>
                             </li>
@@ -95,11 +98,12 @@
     <div class="w-full pt-10 px-4 sm:px-6 md:px-8 lg:ps-72">
         <!-- your content goes here ... -->
 
-        <div class="h-full flex flex-col bg-white border border-gray-200 shadow-sm rounded-xl p-4 md:p-5 overflow-y-auto" style="height: 32rem" id="scroll">
+        <div class="h-full flex flex-col bg-white border border-gray-200 shadow-sm rounded-xl p-4 md:p-5 overflow-y-auto"
+            style="height: 32rem" id="scroll">
             <ul class="space-y-5" id="chat-container">
                 {{-- Message --}}
-            </ul> 
-            
+            </ul>
+
         </div>
         {{-- here the input and button --}}
         <div class="relative mt-5">
@@ -138,7 +142,11 @@
         var login_userId = '<?php echo $loggedIn_userId; ?>';
 
         var UserList = $('#user-list');
-
+        $("input").keypress(function(event) {
+            if (event.which == 13) {
+                sendMessage(currentChannel);
+            }
+        });
         UserList.on('click', 'li', function() {
             recipientId = $(this).attr('data-id');
             recipientName = $(this).attr('data-name');
@@ -252,6 +260,7 @@
         $.get('/user-avatars', function(data) {
             window.userAvatars = data;
         });
+
         function displayMessage(messageObject, recipientName) {
             var isLocalSender = messageObject.connectionId == ably.connection.id;
             var senderAvatarUrl = userAvatars[login_userId];
@@ -297,26 +306,25 @@
                     channel_id: channel_id
                 },
                 success: function(response) {
-                    if (response.success == true)
-                    {
+                    if (response.success == true) {
                         console.log(response.messages);
                         // displayMessage(response.message, response.message);
                         // console.log(response.messages[0].user.name);
-                        for(let key in response.messages){
+                        for (let key in response.messages) {
                             // console.log(response.messages[key]);
                             showMessage(response.messages[key], response.messages[key].user.name);
                         }
-                    }
-                    else{
+                    } else {
                         console.log(response.error);
                     }
-                        
+
                 },
 
             });
         }
+
         function showMessage(messageObject, recipientName) {
-            var isLocalSender = messageObject.user_id == {{$loggedIn_userId}};
+            var isLocalSender = messageObject.user_id == {{ $loggedIn_userId }};
             var senderAvatarUrl = userAvatars[login_userId];
             var recipientAvatarUrl = userAvatars[recipientId];
             const chatContainer = $('#chat-container');
@@ -349,7 +357,8 @@
             </span>
         </li>`;
             chatContainer.append(isLocalSender == true ? message2 : message1);
-            window.scrollTo(0, document.getElementById('scroll').scrollTo(0,(document.querySelector('#chat-container').offsetHeight + 50)));
+            window.scrollTo(0, document.getElementById('scroll').scrollTo(0, (document.querySelector('#chat-container')
+                .offsetHeight + 50)));
         }
     </script>
 </x-app-layout>
